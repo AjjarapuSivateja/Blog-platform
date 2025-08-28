@@ -3,6 +3,7 @@ package com.sivateja.blog.services.impl;
 import com.sivateja.blog.domain.entities.Tag;
 import com.sivateja.blog.repositories.TagRepository;
 import com.sivateja.blog.services.TagService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -53,5 +54,20 @@ public class TagServiceImpl implements TagService {
         }
         tagRepository.deleteById(id);
         });
+    }
+
+    @Override
+    public Tag getTagById(UUID id) {
+        return tagRepository.findById(id)
+                .orElseThrow(()-> new EntityNotFoundException("Tag not found with id"+id));
+    }
+
+    @Override
+    public List<Tag> getTagByIds(Set<UUID> ids) {
+        List<Tag> foundTags = tagRepository.findAllById(ids);
+        if(foundTags.size()!=ids.size()){
+            throw new EntityNotFoundException("Not all specified tag Ids exists ");
+        }
+        return foundTags;
     }
 }
